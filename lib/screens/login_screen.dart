@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../components/custom_button.dart';
-import '../components/password_field.dart'; // Asegúrate de importar el PasswordField
-import '../providers/auth_provider.dart';
+import 'package:flutter/material.dart'; // Importa el paquete de Flutter para construir la interfaz de usuario.
+import 'package:provider/provider.dart'; // Importa el paquete Provider para la gestión del estado.
+import '../components/custom_button.dart'; // Importa un botón personalizado.
+import '../components/password_field.dart'; // Importa el campo de contraseña personalizado.
+import '../providers/auth_provider.dart'; // Importa el proveedor de autenticación.
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -12,65 +12,61 @@ class LoginScreen extends StatefulWidget {
 }
 
 class LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _emailController =
+      TextEditingController(); // Controlador para el campo de texto del email.
+  final TextEditingController _passwordController =
+      TextEditingController(); // Controlador para el campo de texto de la contraseña.
+  final _formKey = GlobalKey<FormState>(); // Clave global para el formulario.
 
+  // Función para validar el email.
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Ingrese su correo electrónico';
+      return 'Ingrese su correo electrónico'; // Mensaje de error si el campo está vacío.
     }
     final RegExp emailRegex = RegExp(
         r'[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*@[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*[.][a-zA-Z]{2,5}');
     if (!emailRegex.hasMatch(value)) {
-      return 'Ingrese un correo electrónico válido';
+      return 'Ingrese un correo electrónico válido'; // Mensaje de error si el email no es válido.
     }
-    return null;
+    return null; // Retorna null si el email es válido.
   }
 
-  String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Ingrese su contraseña';
-    }
-    if (value.length < 4) {
-      return 'La contraseña debe tener al menos 4 caracteres';
-    }
-    return null;
-  }
-
+  // Función para validar la contraseña.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20), // Padding alrededor del contenido.
         child: Stack(
           children: [
             const Align(
-              alignment: Alignment.topLeft,
+              alignment:
+                  Alignment.topLeft, // Alinea el contenido al tope izquierdo.
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment
+                    .start, // Alinea los hijos al inicio en el eje horizontal.
                 children: [
-                  SizedBox(height: 40),
+                  SizedBox(height: 40), // Espaciado vertical.
                   Text(
                     '.Pay',
                     style: TextStyle(
-                      fontSize: 48,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 48, // Tamaño de fuente.
+                      fontWeight: FontWeight.bold, // Peso de la fuente.
                     ),
                   ),
-                  SizedBox(height: 25),
+                  SizedBox(height: 25), // Espaciado vertical.
                   Text(
                     'Welcome Back!',
                     style: TextStyle(
-                      fontSize: 40,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 40, // Tamaño de fuente.
+                      fontWeight: FontWeight.bold, // Peso de la fuente.
                     ),
                   ),
-                  SizedBox(height: 6),
+                  SizedBox(height: 6), // Espaciado vertical.
                   Text(
                     'Let\'s Get Start',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 16, // Tamaño de fuente.
                     ),
                   ),
                 ],
@@ -79,74 +75,92 @@ class LoginScreenState extends State<LoginScreen> {
             Center(
               child: SingleChildScrollView(
                 child: Form(
-                  key: _formKey,
+                  key: _formKey, // Asigna la clave del formulario.
                   child: Column(
-                    mainAxisSize: MainAxisSize.min,
+                    mainAxisSize:
+                        MainAxisSize.min, // Tamaño mínimo de la columna.
                     children: [
-                      const SizedBox(height: 200),
+                      const SizedBox(height: 200), // Espaciado vertical.
                       TextFormField(
-                        controller: _emailController,
-                        keyboardType: TextInputType.emailAddress,
+                        controller:
+                            _emailController, // Controlador del campo de texto del email.
+                        keyboardType: TextInputType
+                            .emailAddress, // Tipo de teclado para email.
                         decoration: InputDecoration(
-                          hintText: 'Email',
+                          hintText: 'Email', // Texto de sugerencia.
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(
+                                10), // Bordes redondeados.
                           ),
                         ),
-                        validator: _validateEmail,
+                        validator: _validateEmail, // Validador del email.
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 20), // Espaciado vertical.
                       PasswordField(
                         controller:
-                            _passwordController, // Usa PasswordField en lugar de TextFormField
+                            _passwordController, // Controlador del campo de texto de la contraseña.
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 10), // Espaciado vertical.
                       Align(
-                        alignment: Alignment.centerRight,
+                        alignment: Alignment
+                            .centerRight, // Alinea el contenido a la derecha.
                         child: TextButton(
                           onPressed: () {
                             // Mostrar una alerta simple para Forget Password
                             showDialog(
                               context: context,
                               builder: (context) => AlertDialog(
-                                title: const Text('Forgot Password'),
-                                content: const Text('Reset password here!'),
+                                title: const Text(
+                                    'Forgot Password'), // Título del diálogo.
+                                content: const Text(
+                                    'Reset password here!'), // Contenido del diálogo.
                                 actions: <Widget>[
                                   TextButton(
-                                    child: const Text('OK'),
+                                    child: const Text('OK'), // Texto del botón.
                                     onPressed: () {
-                                      Navigator.of(context).pop();
+                                      Navigator.of(context)
+                                          .pop(); // Cierra el diálogo.
                                     },
                                   ),
                                 ],
                               ),
                             );
                           },
-                          child: const Text('Forget Password?'),
+                          child: const Text(
+                              'Forget Password?'), // Texto del botón.
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 20), // Espaciado vertical.
                       CustomButton(
-                        text: 'Log In',
+                        text: 'Log In', // Texto del botón.
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
+                            // Valida el formulario.
                             final authProvider = Provider.of<AuthProvider>(
                                 context,
-                                listen: false);
-                            authProvider.login(_emailController.text,
-                                _passwordController.text);
+                                listen:
+                                    false); // Obtiene el proveedor de autenticación.
+                            authProvider.login(
+                                _emailController.text,
+                                _passwordController
+                                    .text); // Llama al método de login.
 
                             if (authProvider.isAuthenticated) {
+                              // Verifica si la autenticación fue exitosa.
                               showDialog(
                                 context: context,
                                 builder: (context) => AlertDialog(
-                                  title: const Text('Success'),
-                                  content: const Text('Login successful!'),
+                                  title: const Text(
+                                      'Success'), // Título del diálogo.
+                                  content: const Text(
+                                      'Login successful!'), // Contenido del diálogo.
                                   actions: <Widget>[
                                     TextButton(
-                                      child: const Text('OK'),
+                                      child:
+                                          const Text('OK'), // Texto del botón.
                                       onPressed: () {
-                                        Navigator.of(context).pop();
+                                        Navigator.of(context)
+                                            .pop(); // Cierra el diálogo.
                                       },
                                     ),
                                   ],
@@ -156,14 +170,17 @@ class LoginScreenState extends State<LoginScreen> {
                               showDialog(
                                 context: context,
                                 builder: (context) => AlertDialog(
-                                  title: const Text('Error'),
-                                  content:
-                                      const Text('Invalid email or password'),
+                                  title: const Text(
+                                      'Error'), // Título del diálogo.
+                                  content: const Text(
+                                      'Invalid email or password'), // Contenido del diálogo.
                                   actions: <Widget>[
                                     TextButton(
-                                      child: const Text('OK'),
+                                      child:
+                                          const Text('OK'), // Texto del botón.
                                       onPressed: () {
-                                        Navigator.of(context).pop();
+                                        Navigator.of(context)
+                                            .pop(); // Cierra el diálogo.
                                       },
                                     ),
                                   ],
@@ -173,19 +190,22 @@ class LoginScreenState extends State<LoginScreen> {
                           }
                         },
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 20), // Espaciado vertical.
                       TextButton(
                         onPressed: () {
                           showDialog(
                             context: context,
                             builder: (context) => AlertDialog(
-                              title: const Text('Create Account'),
-                              content: const Text('Create your account here!'),
+                              title: const Text(
+                                  'Create Account'), // Título del diálogo.
+                              content: const Text(
+                                  'Create your account here!'), // Contenido del diálogo.
                               actions: <Widget>[
                                 TextButton(
-                                  child: const Text('OK'),
+                                  child: const Text('OK'), // Texto del botón.
                                   onPressed: () {
-                                    Navigator.of(context).pop();
+                                    Navigator.of(context)
+                                        .pop(); // Cierra el diálogo.
                                   },
                                 ),
                               ],
@@ -193,9 +213,10 @@ class LoginScreenState extends State<LoginScreen> {
                           );
                         },
                         child: const Text(
-                          'New User? Create Account',
-                          style:
-                              TextStyle(color: Color.fromARGB(255, 97, 96, 95)),
+                          'New User? Create Account', // Texto del botón.
+                          style: TextStyle(
+                              color: Color.fromARGB(
+                                  255, 97, 96, 95)), // Estilo del texto.
                         ),
                       ),
                     ],
