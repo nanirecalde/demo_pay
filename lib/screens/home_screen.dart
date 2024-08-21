@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../providers/card_color_provider.dart';
 import '../widgets/transaction_list.dart';
 import '../widgets/card_info.dart';
+import 'contact_list_screen.dart';
 import '../widgets/carousel_slider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -19,7 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   static const List<Widget> _widgetOptions = <Widget>[
     HomeContent(),
-    Center(child: Text('Contact Screen', style: TextStyle(fontSize: 24))),
+    ContactListScreen(),
     Center(child: Text('Settings Screen', style: TextStyle(fontSize: 24))),
   ];
 
