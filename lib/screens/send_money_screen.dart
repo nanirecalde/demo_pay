@@ -1,133 +1,140 @@
-import 'package:flutter/material.dart'; // Importa el paquete de Flutter para construir la interfaz de usuario.
-import 'package:provider/provider.dart'; // Importa el paquete Provider para la gestión del estado.
-import '../providers/send_money_provider.dart'; // Importa el proveedor de envío de dinero.
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
+import '../providers/send_money_provider.dart';
+import '../providers/financial_provider.dart';
+import '../models/transaction.dart';
+import '../widgets/custom_keyboard.dart';
+import 'confirm_send_screen.dart';
+import 'reject_send_screen.dart';
 
 class SendMoneyScreen extends StatelessWidget {
-  const SendMoneyScreen(
-      {super.key}); // Constructor de la clase SendMoneyScreen.
+  const SendMoneyScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final sendMoneyProvider = Provider.of<SendMoneyProvider>(
-        context); // Obtiene una instancia del proveedor de envío de dinero.
+    final sendMoneyProvider = Provider.of<SendMoneyProvider>(context);
+    final financialProvider = Provider.of<FinancialProvider>(context);
+
+    void handleKeyPress(String key) {
+      if (key == '<') {
+        sendMoneyProvider.deleteLastDigit();
+      } else if (key == '.') {
+        sendMoneyProvider.addDecimal();
+      } else {
+        sendMoneyProvider.addDigit(key);
+      }
+    }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Send Money'), // Título de la AppBar.
+        title: const Text('Send Money'),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back), // Icono de flecha hacia atrás.
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(
-                context); // Navega hacia atrás en la pila de navegación.
+            sendMoneyProvider.reset(); // Resetea el monto al regresar
+            Navigator.pop(context);
           },
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0), // Padding alrededor del cuerpo.
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment
-              .center, // Alinea los hijos al centro horizontalmente.
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             CircleAvatar(
-              radius: 30, // Radio del avatar circular.
-              backgroundImage: NetworkImage(sendMoneyProvider
-                  .contactAvatar), // Imagen de fondo del avatar.
+              radius: 30,
+              backgroundImage: NetworkImage(sendMoneyProvider.contactAvatar),
             ),
-            const SizedBox(height: 10), // Espaciado vertical.
+            const SizedBox(height: 10),
             Text(
-              sendMoneyProvider.contactName, // Nombre del contacto.
-              style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold), // Estilo del texto.
+              sendMoneyProvider.contactName,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             Text(
-              'AC: ${sendMoneyProvider.contactAccount}', // Cuenta del contacto.
-              style: const TextStyle(color: Colors.grey), // Estilo del texto.
+              'AC: ${sendMoneyProvider.contactAccount}',
+              style: const TextStyle(color: Colors.grey),
             ),
-            const SizedBox(height: 20), // Espaciado vertical.
+            const SizedBox(height: 20),
             Text(
-              '\$${sendMoneyProvider.amount.toStringAsFixed(2)}', // Monto a enviar.
-              style: const TextStyle(
-                  fontSize: 40,
-                  fontWeight: FontWeight.bold), // Estilo del texto.
+              sendMoneyProvider.amountString,
+              style: const TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 20), // Espaciado vertical.
+            const SizedBox(height: 20),
             Expanded(
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3, // Número de columnas en la cuadrícula.
-                  childAspectRatio: 2, // Relación de aspecto de los hijos.
-                ),
-                itemCount: 12, // Número de elementos en la cuadrícula.
-                itemBuilder: (context, index) {
-                  if (index == 9) {
-                    return const SizedBox
-                        .shrink(); // Espacio vacío en la posición 9.
-                  } else if (index == 10) {
-                    return GestureDetector(
-                      onTap: () {
-                        sendMoneyProvider
-                            .updateAmount(0); // Actualiza el monto a 0.
-                      },
-                      child: Container(
-                        alignment:
-                            Alignment.center, // Alinea el contenido al centro.
-                        child: const Text(
-                          '0', // Texto del botón.
-                          style: TextStyle(fontSize: 24), // Estilo del texto.
-                        ),
-                      ),
-                    );
-                  } else if (index == 11) {
-                    return GestureDetector(
-                      onTap: () {
-                        sendMoneyProvider.updateAmount(
-                          double.parse(
-                            sendMoneyProvider.amount.toString().substring(
-                                0,
-                                sendMoneyProvider.amount.toString().length -
-                                    1), // Elimina el último dígito del monto.
-                          ),
-                        );
-                      },
-                      child: const Icon(Icons.backspace), // Icono de retroceso.
-                    );
-                  } else {
-                    return GestureDetector(
-                      onTap: () {
-                        final number =
-                            index + 1; // Calcula el número basado en el índice.
-                        sendMoneyProvider.updateAmount(
-                          sendMoneyProvider.amount * 10 +
-                              number, // Actualiza el monto.
-                        );
-                      },
-                      child: Container(
-                        alignment:
-                            Alignment.center, // Alinea el contenido al centro.
-                        child: Text(
-                          '${index + 1}', // Texto del botón.
-                          style: const TextStyle(
-                              fontSize: 24), // Estilo del texto.
-                        ),
-                      ),
-                    );
-                  }
-                },
-              ),
+              child: CustomKeyboard(onKeyPressed: handleKeyPress),
             ),
             ElevatedButton(
               onPressed: () {
-                // Lógica para continuar
+                final double amountToSend = sendMoneyProvider.amount;
+                final double currentBalance = financialProvider.balance;
+
+                // Validar si el monto es menor que $2
+                if (amountToSend < 2.0) {
+                  // Mostrar pantalla de rechazo si el monto es menor que $2
+                  showDialog(
+                    context: context,
+                    builder: (context) => RejectSendScreen(
+                      amount: amountToSend,
+                      balance: currentBalance,
+                      reason: 'The minimum amount you can send is \$2.00.',
+                    ),
+                  );
+                }
+                // Validar si el monto supera el balance
+                else if (amountToSend > currentBalance) {
+                  // Mostrar pantalla de rechazo si el monto es mayor que el balance disponible
+                  showDialog(
+                    context: context,
+                    builder: (context) => RejectSendScreen(
+                      amount: amountToSend,
+                      balance: currentBalance,
+                      reason:
+                          'Insufficient balance to complete the transaction.',
+                    ),
+                  );
+                } else {
+                  // Formatear la fecha
+                  final String formattedDate =
+                      DateFormat('MMMM dd, yyyy').format(DateTime.now());
+
+                  // Crear una nueva transacción
+                  final newTransaction = Transaction(
+                    name: sendMoneyProvider.contactName,
+                    date: formattedDate, // Fecha formateada
+                    amount: sendMoneyProvider.amount,
+                    isCredit: false,
+                  );
+
+                  // Mostrar la pantalla de confirmación
+                  showDialog(
+                    context: context,
+                    builder: (context) => ConfirmSendScreen(
+                      amount: sendMoneyProvider.amount,
+                      onConfirmed: () {
+                        // Actualizar los valores financieros
+                        financialProvider.addExpense(sendMoneyProvider.amount);
+
+                        // Agregar la nueva transacción al historial
+                        financialProvider.addTransaction(newTransaction);
+
+                        // Resetea el formulario después de enviar dinero
+                        sendMoneyProvider.reset();
+
+                        // Navegar a la pantalla de éxito
+                        Navigator.pushReplacementNamed(context, '/success');
+                      },
+                    ),
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange, // Color de fondo del botón.
-                minimumSize:
-                    const Size.fromHeight(50), // Tamaño mínimo del botón.
+                backgroundColor: Colors.orange,
+                minimumSize: const Size.fromHeight(50),
               ),
               child: const Text(
-                'Continue', // Texto del botón.
-                style: TextStyle(fontSize: 18), // Estilo del texto.
+                'Continue',
+                style: TextStyle(fontSize: 18),
               ),
             ),
           ],

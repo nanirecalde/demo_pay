@@ -1,42 +1,57 @@
-import 'package:flutter/material.dart'; // Importa el paquete de Flutter para construir la interfaz de usuario.
+// providers/send_money_provider.dart
+import 'package:flutter/material.dart';
 
 class SendMoneyProvider with ChangeNotifier {
-  // Define una clase que extiende ChangeNotifier para la gestión del estado.
-  String _contactName =
-      ''; // Variable privada para almacenar el nombre del contacto.
-  String _contactAccount =
-      ''; // Variable privada para almacenar la cuenta del contacto.
-  String _contactAvatar =
-      ''; // Variable privada para almacenar el avatar del contacto.
-  double _amount = 0.0; // Variable privada para almacenar el monto a enviar.
+  String _contactName = '';
+  String _contactAccount = '';
+  String _contactAvatar = '';
+  String _amountString = '0';
 
-  // Getters para acceder a las variables privadas desde fuera de la clase.
-  String get contactName => _contactName; // Obtiene el nombre del contacto.
-  String get contactAccount =>
-      _contactAccount; // Obtiene la cuenta del contacto.
-  String get contactAvatar => _contactAvatar; // Obtiene el avatar del contacto.
-  double get amount => _amount; // Obtiene el monto a enviar.
+  String get contactName => _contactName;
+  String get contactAccount => _contactAccount;
+  String get contactAvatar => _contactAvatar;
+  String get amountString => _amountString;
 
-  // Método para establecer los detalles del contacto.
+  double get amount => double.tryParse(_amountString) ?? 0.0;
+
   void setContactDetails(String name, String account, String avatar) {
-    _contactName = name; // Asigna el nombre del contacto.
-    _contactAccount = account; // Asigna la cuenta del contacto.
-    _contactAvatar = avatar; // Asigna el avatar del contacto.
-    notifyListeners(); // Notifica a los oyentes que el estado ha cambiado.
+    _contactName = name;
+    _contactAccount = account;
+    _contactAvatar = avatar;
+    notifyListeners();
   }
 
-  // Método para actualizar el monto a enviar.
-  void updateAmount(double value) {
-    _amount = value; // Asigna el nuevo monto.
-    notifyListeners(); // Notifica a los oyentes que el estado ha cambiado.
+  void addDigit(String digit) {
+    if (_amountString == '0') {
+      _amountString = digit;
+    } else {
+      _amountString += digit;
+    }
+    notifyListeners();
   }
 
-  // Método para reiniciar los detalles del contacto y el monto.
+  void addDecimal() {
+    if (!_amountString.contains('.')) {
+      _amountString += '.';
+    }
+    notifyListeners();
+  }
+
+  void deleteLastDigit() {
+    if (_amountString.isNotEmpty) {
+      _amountString = _amountString.substring(0, _amountString.length - 1);
+      if (_amountString.isEmpty || _amountString == '0') {
+        _amountString = '0';
+      }
+    }
+    notifyListeners();
+  }
+
   void reset() {
-    _contactName = ''; // Reinicia el nombre del contacto.
-    _contactAccount = ''; // Reinicia la cuenta del contacto.
-    _contactAvatar = ''; // Reinicia el avatar del contacto.
-    _amount = 0.0; // Reinicia el monto.
-    notifyListeners(); // Notifica a los oyentes que el estado ha cambiado.
+    _contactName = '';
+    _contactAccount = '';
+    _contactAvatar = '';
+    _amountString = '0';
+    notifyListeners();
   }
 }

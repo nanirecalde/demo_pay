@@ -6,33 +6,28 @@ import '../widgets/transaction_list.dart'; // Importa el widget TransactionList.
 import '../widgets/card_info.dart'; // Importa el widget CardInfo.
 import 'contact_list_screen.dart'; // Importa la pantalla de lista de contactos.
 import '../widgets/carousel_slider.dart'; // Importa el widget CarouselSlider.
+import '../providers/financial_provider.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key}); // Constructor de la clase HomeScreen.
+  const HomeScreen({super.key});
 
   @override
   // ignore: library_private_types_in_public_api
-  _HomeScreenState createState() =>
-      _HomeScreenState(); // Crea el estado del widget.
+  _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex =
-      0; // Variable para almacenar el índice del elemento seleccionado en la barra de navegación inferior.
+  int _selectedIndex = 0;
 
-  // Lista de widgets que se mostrarán según el índice seleccionado.
   static const List<Widget> _widgetOptions = <Widget>[
-    HomeContent(), // Contenido de la pantalla principal.
-    ContactListScreen(), // Pantalla de lista de contactos.
-    Center(
-        child: Text('Settings Screen',
-            style: TextStyle(fontSize: 24))), // Pantalla de configuración.
+    HomeContent(),
+    ContactListScreen(),
+    SettingsScreen(),
   ];
 
-  // Método que se llama cuando se selecciona un elemento en la barra de navegación inferior.
   void _onItemTapped(int index) {
     setState(() {
-      _selectedIndex = index; // Actualiza el índice seleccionado.
+      _selectedIndex = index;
     });
   }
 
@@ -40,98 +35,84 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home Screen'), // Título de la AppBar.
-        // Hace que el color de la AppBar coincida con el color de la tarjeta usando el proveedor de estado.
+        title: const Text('Home Screen'),
         backgroundColor: Provider.of<CardColorProvider>(context).currentColor,
       ),
       drawer: Drawer(
         child: ListView(
-          padding: EdgeInsets.zero, // Elimina el padding predeterminado.
+          padding: EdgeInsets.zero,
           children: <Widget>[
             const DrawerHeader(
               decoration: BoxDecoration(
-                color: Colors.blue, // Color de fondo del encabezado del Drawer.
+                color: Colors.blue,
               ),
               child: Text(
-                'Menu', // Texto del encabezado del Drawer.
+                'Menu',
                 style: TextStyle(
-                  color: Colors.white, // Color del texto.
-                  fontSize: 24, // Tamaño de la fuente.
+                  color: Colors.white,
+                  fontSize: 24,
                 ),
               ),
             ),
             ListTile(
-              leading:
-                  const Icon(Icons.logout), // Icono del elemento de la lista.
-              title: const Text('Log Out'), // Texto del elemento de la lista.
+              leading: const Icon(Icons.logout),
+              title: const Text('Log Out'),
               onTap: () {
-                Navigator.pushReplacementNamed(
-                    context, '/'); // Navega a la pantalla de inicio de sesión.
+                Navigator.pushReplacementNamed(context, '/');
               },
             ),
           ],
         ),
       ),
-      body: _widgetOptions.elementAt(
-          _selectedIndex), // Muestra el widget correspondiente al índice seleccionado.
+      body: _widgetOptions.elementAt(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(
-                Icons.home), // Icono del elemento de la barra de navegación.
-            label: 'Home', // Etiqueta del elemento de la barra de navegación.
+            icon: Icon(Icons.home),
+            label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons
-                .contacts), // Icono del elemento de la barra de navegación.
-            label:
-                'Contact', // Etiqueta del elemento de la barra de navegación.
+            icon: Icon(Icons.contacts),
+            label: 'Contact',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons
-                .settings), // Icono del elemento de la barra de navegación.
-            label:
-                'Settings', // Etiqueta del elemento de la barra de navegación.
+            icon: Icon(Icons.settings),
+            label: 'Settings',
           ),
         ],
-        currentIndex: _selectedIndex, // Índice del elemento seleccionado.
-        selectedItemColor: Colors.blue, // Color del elemento seleccionado.
-        onTap:
-            _onItemTapped, // Llama al método _onItemTapped cuando se selecciona un elemento.
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.blue,
+        onTap: _onItemTapped,
       ),
     );
   }
 }
 
 class HomeContent extends StatelessWidget {
-  const HomeContent({super.key}); // Constructor de la clase HomeContent.
+  const HomeContent({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const SizedBox(height: 20), // Espaciado vertical.
-        const UserCard(), // Muestra el widget UserCard.
-        const SizedBox(height: 20), // Espaciado vertical.
+        const SizedBox(height: 20),
+        const UserCard(),
+        const SizedBox(height: 20),
         Consumer<CardColorProvider>(
           builder: (context, colorProvider, child) {
             return CarouselSlider(
-              height: 200.0, // Altura del carrusel.
+              height: 200.0,
               items: colorProvider.colors.map((color) {
                 return Container(
-                  margin: const EdgeInsets.symmetric(
-                      horizontal: 5.0), // Margen horizontal.
+                  margin: const EdgeInsets.symmetric(horizontal: 5.0),
                   decoration: BoxDecoration(
-                    color: color, // Color de fondo del contenedor.
-                    borderRadius:
-                        BorderRadius.circular(20), // Bordes redondeados.
+                    color: color,
+                    borderRadius: BorderRadius.circular(20),
                   ),
                   child: const Center(
                     child: Text(
-                      'Card', // Texto dentro del contenedor.
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16.0), // Estilo del texto.
+                      'Card',
+                      style: TextStyle(color: Colors.white, fontSize: 16.0),
                     ),
                   ),
                 );
@@ -139,26 +120,41 @@ class HomeContent extends StatelessWidget {
             );
           },
         ),
-        const Padding(
-          padding: EdgeInsets.all(16.0), // Padding alrededor del contenido.
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment
-                .spaceBetween, // Distribuye los hijos con espacio entre ellos.
-            children: [
-              CardInfo(
-                  title: "Expence",
-                  amount: "\$4,264",
-                  color: Colors.redAccent), // Muestra información de gastos.
-              CardInfo(
-                  title: "Income",
-                  amount: "\$3,897",
-                  color: Colors.green), // Muestra información de ingresos.
-              CardInfo(
-                  title: "Balance",
-                  amount: "\$5,156",
-                  color: Colors.blue), // Muestra información del balance.
-            ],
-          ),
+        Consumer<FinancialProvider>(
+          builder: (context, financialProvider, child) {
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Flexible(
+                    child: CardInfo(
+                      title: "Expence",
+                      amount:
+                          "\$${financialProvider.expense.toStringAsFixed(2)}",
+                      color: Colors.redAccent,
+                    ),
+                  ),
+                  Flexible(
+                    child: CardInfo(
+                      title: "Income",
+                      amount:
+                          "\$${financialProvider.income.toStringAsFixed(2)}",
+                      color: Colors.green,
+                    ),
+                  ),
+                  Flexible(
+                    child: CardInfo(
+                      title: "Balance",
+                      amount:
+                          "\$${financialProvider.balance.toStringAsFixed(2)}",
+                      color: Colors.blue,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
         ),
         const Padding(
           padding:
@@ -176,12 +172,35 @@ class HomeContent extends StatelessWidget {
         ),
         Expanded(
           child: ListView(
-            children: [
-              TransactionList(), // Muestra la lista de transacciones.
+            children: const [
+              TransactionList(),
             ],
           ),
         ),
       ],
+    );
+  }
+}
+
+class SettingsScreen extends StatelessWidget {
+  const SettingsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: ListView(
+        padding: const EdgeInsets.all(16.0),
+        children: <Widget>[
+          ListTile(
+            leading: const Icon(Icons.logout),
+            title: const Text('Log Out'),
+            onTap: () {
+              Navigator.pushReplacementNamed(context, '/');
+            },
+          ),
+          // Puedes agregar más opciones de configuración aquí
+        ],
+      ),
     );
   }
 }

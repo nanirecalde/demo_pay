@@ -27,7 +27,7 @@ class CardInfo extends StatelessWidget {
       // Contenedor que envuelve el contenido de la tarjeta.
       child: Container(
         padding: const EdgeInsets.all(16.0), // Padding interno del contenedor.
-        width: 100, // Ancho del contenedor.
+        width: 130, // Ancho del contenedor.
         height: 100, // Altura del contenedor.
         // Decoración del contenedor.
         decoration: BoxDecoration(
